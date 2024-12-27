@@ -34,6 +34,7 @@ enum TransactionType {
 
 enum TransactionCategory {
   HOUSING
+  ENTERTAINMENT
   TRANSPORTATION
   FOOD
   HEALTH
