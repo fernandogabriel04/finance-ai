@@ -3,27 +3,31 @@ import { redirect } from "next/navigation";
 import Navbar from "../_components/navbar";
 import SummaryCards from "./_components/summary-cards";
 import TimeSelect from "./_components/time-select";
-import { isMatch } from "date-fns";
 import TransactionsPieChart from "./_components/transactions-pie-chart";
 import { getDashboard } from "./_data/get-dashboard";
 import ExpensesPerCategory from "./_components/expenses-per-category";
 
 interface HomeProps {
   searchParams: {
-    month: string;
+    period: string;
   };
 }
 
-const Home = async ({ searchParams: { month } }: HomeProps) => {
+const Home = async ({ searchParams: { period } }: HomeProps) => {
   const { userId } = await auth();
   if (!userId) {
     redirect("/login");
   }
-  const monthIsInvalid = !month || !isMatch(month, "MM");
-  if (monthIsInvalid) {
-    redirect("?month=01");
+
+  const defaultPeriod = `01-${new Date().getFullYear()}`;
+  const periodIsValid = period && /^(\d{2})-(\d{4})$/.test(period);
+  const [month, year] = periodIsValid
+    ? period.split("-")
+    : defaultPeriod.split("-");
+  if (!periodIsValid) {
+    redirect(`/?period=${defaultPeriod}`);
   }
-  const dashboard = await getDashboard(month);
+  const dashboard = await getDashboard(month, year);
 
   return (
     <>
