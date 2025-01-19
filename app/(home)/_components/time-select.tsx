@@ -25,6 +25,7 @@ const MONTH_OPTIONS = [
 ];
 
 const CURRENT_YEAR = new Date().getFullYear();
+const CURRENT_MONTH = new Date().getMonth() + 1;
 const YEAR_OPTIONS = Array.from({ length: 10 }, (_, i) => CURRENT_YEAR - i).map(
   (year) => ({ value: year.toString(), label: year.toString() }),
 );
@@ -32,7 +33,9 @@ const YEAR_OPTIONS = Array.from({ length: 10 }, (_, i) => CURRENT_YEAR - i).map(
 const TimeSelect = () => {
   const { push } = useRouter();
   const searchParams = useSearchParams();
-  const currentPeriod = searchParams.get("period") || `01-${CURRENT_YEAR}`;
+  const currentPeriod =
+    searchParams.get("period") ||
+    `${CURRENT_MONTH.toString().padStart(2, "0")}-${CURRENT_YEAR}`;
   const [month, year] = currentPeriod.split("-");
 
   const handleTimeChange = (newMonth: string, newYear: string) => {
