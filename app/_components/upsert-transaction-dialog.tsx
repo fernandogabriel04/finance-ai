@@ -50,7 +50,7 @@ interface UpsertTransactionDialogProps {
 }
 
 const formSchema = z.object({
-  name: z.string().min(1, {
+  name: z.string().trim().min(1, {
     message: "O nome é obrigatório.",
   }),
   amount: z
@@ -65,9 +65,17 @@ const formSchema = z.object({
   paymentMethod: z.nativeEnum(TransactionPaymentMethod, {
     required_error: "O método de pagamento é obrigatório.",
   }),
-  date: z.date({
-    required_error: "A data é obrigatória.",
-  }),
+  date: z
+    .union([z.date(), z.string()])
+    .transform((value) => {
+      if (!value) {
+        throw new Error("A data é obrigatória."); // Erro exibido se o valor estiver vazio
+      }
+      return typeof value === "string" ? new Date(value) : value;
+    })
+    .refine((date) => date instanceof Date && !isNaN(date.getTime()), {
+      message: "Insira uma data válida.", // Mensagem de erro para data inválida
+    }),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -81,7 +89,7 @@ const UpsertTransactionDialog = ({
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues ?? {
-      amount: 0,
+      amount: 50,
       category: TransactionCategory.OTHER,
       date: new Date(),
       name: "",
@@ -148,6 +156,7 @@ const UpsertTransactionDialog = ({
                   <FormControl>
                     <MoneyInput
                       placeholder="Digite o valor da transação..."
+                      value={field.value}
                       onValueChange={({ floatValue }) => {
                         field.onChange(floatValue);
                       }}
