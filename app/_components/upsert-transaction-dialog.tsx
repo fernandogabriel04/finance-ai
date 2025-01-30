@@ -255,7 +255,15 @@ const UpsertTransactionDialog = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Data da Transação</FormLabel>
-                  <DatePicker value={field.value} onChange={field.onChange} />
+                  <DatePicker
+                    value={field.value}
+                    onChange={(date) => {
+                      console.log("Nova data selecionada:", date); // Debug
+                      if (date) {
+                        field.onChange(date);
+                      }
+                    }}
+                  />
                   <FormMessage />
                 </FormItem>
               )}
